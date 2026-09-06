@@ -1,6 +1,6 @@
 # tendobros-apps
 
-A monorepo holding two independent Python projects.
+A monorepo for independent Python projects.
 
 | Project | What it is | Docs |
 |---|---|---|
