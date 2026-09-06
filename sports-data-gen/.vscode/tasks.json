@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "mlb_scraper: run with args",
+            "type": "shell",
+            "command": "${workspaceFolder}/.venv/Scripts/python.exe -m mlb_scraper ${input:mlbArgs}",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "mlbArgs",
+            "type": "promptString",
+            "description": "Args ONLY -- do not include 'python -m mlb_scraper', that's already added for you. e.g. extract --start 2026-08-01 --end 2026-08-04 --dry-run -v, or transform, or load",
+            "default": "extract --start 2026-08-04 --end 2026-08-04 --dry-run -v"
+        }
+    ]
+}

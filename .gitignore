@@ -1,0 +1,26 @@
+# Monorepo-wide safety net. Each project's own .gitignore is authoritative
+# for that project -- see job-scanner/.gitignore and sports-data-gen/.gitignore,
+# both of which document their reasoning inline. Only add a rule here if it
+# should hold for EVERY project in this repo, including ones not yet added.
+
+# Python, per-machine
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Secrets. The negation is **-prefixed so it reaches every subdirectory.
+.env
+.env.*
+!**/.env.example
+
+# Scratch
+*.bak
+*.bak-*
+*.tmp
+
+# OS / editor
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store

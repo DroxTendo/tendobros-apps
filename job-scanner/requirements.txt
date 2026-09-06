@@ -1,0 +1,3 @@
+# Runtime dependency for the fetch scripts a scan writes. The checked-in matcher
+# in bin/ is pure stdlib and needs nothing from here.
+requests>=2.32.3

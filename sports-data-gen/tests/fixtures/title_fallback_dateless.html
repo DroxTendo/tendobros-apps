@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<!--
+  Hand-written stand-in for Baseball-Reference's dateless fallback page.
+
+  The original capture (a real 2026-08-07 request that silently returned
+  2026-08-06's games) could not be regenerated: re-requesting that date today
+  returns the genuine page, so the anomaly is gone from the source. The title
+  below is the one that capture carried, and page_matches_date() reads nothing
+  else -- note the missing "for {weekday}, {date}" clause, which is the entire
+  signal. See tests/test_page_matches_date.py.
+-->
+<html>
+<head>
+<title>2026 MLB Scores, Standings, Box Scores | Baseball-Reference.com</title>
+</head>
+<body></body>
+</html>
