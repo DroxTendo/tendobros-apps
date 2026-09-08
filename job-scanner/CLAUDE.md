@@ -139,7 +139,8 @@ Six dispatch groups (G1, G2, G3, G4a, G4b, G5) run concurrently — the split is
 write the trackers**; the orchestrator compiles the report and owns every write. The orchestrator also
 runs the Indeed source itself (`resources/indeed.md`).
 
-Output goes to `matches/{date}.md` at the project root — `-r2`, `-r3` for same-day re-runs, **never
+Output goes to `matches/{date}-r{N}.md` at the project root — **the first run of a day is `-r1`**
+(changed 2026-09-08; it was a bare `{date}.md`), then `-r2`, `-r3` for same-day re-runs, **never
 overwrite or append to an existing day's file.** Format is fixed: **eight** tables
 (`Company | Title | Location | Link`), then prose under `# Notes` — Core / **Data Analyst** /
 **Leadership & Management** / Borderline for the company list, then the same four for Indeed.

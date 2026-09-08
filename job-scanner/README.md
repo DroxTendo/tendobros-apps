@@ -153,7 +153,8 @@ resume itself is private.
 Output stays at the top level rather than under `resources/`, since it's what the operator actually
 opens.
 
-- **`{date}.md`** — one file per run, then `-r2`, `-r3` for repeat scans the same day. 🔴 **Never
+- **`{date}-r{N}.md`** — one file per run, numbered from `-r1`, then `-r2`, `-r3` for repeat
+  scans the same day *(the first run was a bare `{date}.md` until 2026-09-08)*. 🔴 **Never
   overwrite or append to an existing day's file.** **Disposable** — these are write-ups to read, not
   the tracking mechanism.
 
@@ -170,7 +171,7 @@ source itself.
 3. Filter against `profile.md` using `bin/`, applying `rules.md`. **US only** — a hard exclusion, decided
    client-side after enumerating the whole board, never as a filter on the fetch.
 4. Diff against the trackers, matching on **stable ID, not raw URL** — slugs drift while req IDs don't.
-5. Write the report to `matches/{date}.md`: **eight tables** (`Company | Title | Location | Link`) —
+5. Write the report to `matches/{date}-r{N}.md` (first run of a day is `-r1`): **eight tables** (`Company | Title | Location | Link`) —
    Core, Data Analyst, Leadership & Management, Borderline for the company list, then the same four for
    Indeed — followed by prose under `# Notes`. Every table is emitted even when empty, carrying a
    `*(none)*` placeholder. Every posting needs its full canonical URL. **`rules.md` §4 is authoritative

@@ -303,13 +303,21 @@ def check_return_contract(r, root):
 
 # ---------------------------------------------------------------------------------------
 
-def check_real_trackers_untouched(r, fingerprints):
+def check_real_trackers_untouched(r, fingerprints, pre_existing_baks):
     for path, before in fingerprints.items():
         after = os.path.exists(path) and (os.path.getsize(path), os.path.getmtime(path))
         r.ok("the real " + os.path.basename(path) + " was never written",
              after == before, "{0} -> {1}".format(before, after))
-    strays = baks(T.SEEN_JOBS) + baks(T.INDEED_SEEN)
-    r.ok("no stray backup landed in private/", strays == [], str(strays))
+    # 🔴 A DELTA, never an absolute. This asserted `strays == []` until 2026-09-07, which
+    # contradicted the module under test: KEEP_BACKUPS is 3, so up to three backups are
+    # DESIGNED to sit in private/ after a real scan. The absolute form therefore failed on
+    # every run following a tracker write -- not because the suite had touched anything (the
+    # fingerprint checks above prove it had not), but because a legitimate backup existed.
+    # It went unnoticed only because a sanitisation pass had left private/ with zero backups.
+    # A check that cries wolf on healthy state is one nobody reads the next time it fires.
+    strays = [b for b in baks(T.SEEN_JOBS) + baks(T.INDEED_SEEN)
+              if b not in pre_existing_baks]
+    r.ok("no NEW backup landed in private/", strays == [], str(strays))
 
 
 def main():
@@ -317,6 +325,7 @@ def main():
     for path in (T.SEEN_JOBS, T.INDEED_SEEN):
         fingerprints[path] = (os.path.exists(path)
                               and (os.path.getsize(path), os.path.getmtime(path)))
+    pre_existing_baks = set(baks(T.SEEN_JOBS) + baks(T.INDEED_SEEN))
 
     r = Recorder()
     root = tempfile.mkdtemp(prefix="jstracker-")
@@ -332,7 +341,7 @@ def main():
         check_delta_mismatch(r, root)
         check_write_mismatch(r, root)
         check_return_contract(r, root)
-        check_real_trackers_untouched(r, fingerprints)
+        check_real_trackers_untouched(r, fingerprints, pre_existing_baks)
     finally:
         shutil.rmtree(root, ignore_errors=True)
 

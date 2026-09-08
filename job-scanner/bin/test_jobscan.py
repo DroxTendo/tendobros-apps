@@ -710,6 +710,23 @@ REQID_SAME = [
     # 400 sampled records -- the fold must key on the WHOLE id, not the prefix
     ("https://careers.petsmart.com/jobs/103680946405-1213302994",
      "https://careers.petsmart.com/jobs/103680946405-1213302994/retail-sales-associate"),
+    # Post Holdings (registered 2026-09-08). THREE drifts stack on one requisition: the
+    # per-brand iCIMS host vs the aggregate board, the /careers-home path prefix, and a
+    # trailing /login. Both pairs below are LIVE tracker collisions that already cost a
+    # duplicate persist on 2026-09-04 -- 29572 was tracked from 08-03 and 31755 from 08-18,
+    # and both were re-reported as new with byte-identical titles.
+    ("https://postholdingsjobs-postholdings.icims.com/jobs/29572/login",
+     "https://jobs.postholdings.com/jobs/29572"),
+    ("https://postconsumerbrandssljobs-postholdings.icims.com/jobs/31755/login",
+     "https://jobs.postholdings.com/jobs/31755"),
+    # cross-brand: a Bob Evans requisition resolves on the aggregate board under the SAME
+    # bare id -- proven at the server, which is what makes the id space provably shared
+    # rather than merely plausibly shared
+    ("https://bobevanssljobs-postholdings.icims.com/jobs/31166/login",
+     "https://jobs.postholdings.com/careers-home/jobs/31166"),
+    # /login carries no identity: the server returns the same posting and title with it
+    ("https://jobs.postholdings.com/jobs/29572",
+     "https://jobs.postholdings.com/jobs/29572/login"),
 ]
 
 # Pairs that MUST NOT share a req-id key. These are the ways a narrow fold could go wrong.
@@ -743,6 +760,11 @@ REQID_DIFFER = [
     # different plain PetSmart reqs
     ("https://careers.petsmart.com/jobs/7664/senior-data-engineer",
      "https://careers.petsmart.com/jobs/7709/data-engineer"),
+    # different Post Holdings reqs, across brands and on the aggregate board alike
+    ("https://bobevanssljobs-postholdings.icims.com/jobs/31166/login",
+     "https://postconsumerbrandssljobs-postholdings.icims.com/jobs/31755/login"),
+    ("https://jobs.postholdings.com/jobs/29572",
+     "https://jobs.postholdings.com/jobs/31755"),
 ]
 
 # URLs that must NOT be claimed by the registry at all -- an unregistered shape is never
@@ -757,6 +779,12 @@ REQID_UNREGISTERED = [
     # iCIMS hosts (2careers-, 1cacareers-, crcareers-) plus a Cadient host; those carry a
     # different id space and must never fold against the canonical board.
     "https://2careers-petsmart.icims.com/jobs/7741/login",
+    # 🔴 The postholdings shape matches the `-postholdings.icims.com` SUFFIX FAMILY. It must
+    # not leak to any other employer's iCIMS tenant -- iCIMS is multi-tenant and req ids are
+    # per-account, so folding across accounts would collapse unrelated employers exactly the
+    # way a non-tenant-scoped Greenhouse fold would.
+    "https://careers-cotiviti.icims.com/jobs/12345/login",
+    "https://globalcareers-cotiviti.icims.com/jobs/29572",
     "https://crcareers-petsmart.icims.com/jobs/7664/senior-data-engineer",
 ]
 

@@ -708,6 +708,7 @@ this section retired on the operator's instruction**, so they cannot be closed b
 | Progressive slug drift | — | — | OPEN |
 | Scopely `?gh_jid=` restating the path | — | — | fixed |
 | Adobe `/apply` suffix | — | — | fixed |
+| **Post Holdings brand-host + `/careers-home` + `/login`** *(2026-09-08)* | `{brand}jobs-postholdings.icims.com/jobs/{req}/login` | `jobs.postholdings.com/{careers-home/}jobs/{req}` | **fixed — `postholdings` registered; 2 requisitions had already double-persisted** |
 | **Humana req-first** *(new 2026-09-02)* | `careers.humana.com/us/en/job/{REQ}/{Slug}` | req-last, on both the public and Workday forms | OPEN |
 | **Jellyvision dual-scheme Greenhouse** *(new 2026-09-02)* | `job-boards.greenhouse.io/jellyvision/jobs/{req}` | `www.jellyvision.com/about-us/careers/apply/?gh_jid={req}` | OPEN |
 | Pfizer dual-scheme *(2026-09-01 r2)* | `www.pfizer.com/about/careers/job/{req}` | CXS `…_{req}-2` | OPEN |
@@ -752,9 +753,50 @@ under a new URL is something they want to see. It creates a **narrow whitelist**
   deliberately **not** widened — that would be a global change collapsing postings nobody
   examined.
 - 🔴 **A shape not in the registry is NOT folded.** Registered: `adobe`, `pantheon`, `ulta`,
-  `progressive`, **`petsmart` (added 2026-09-01 r2)**. Adding one requires running the evidence
+  `progressive`, **`petsmart` (added 2026-09-01 r2)**, **`postholdings` (added 2026-09-08)**.
+  Adding one requires running the evidence
   check first — every tracker key the shape matches, grouped by extracted req id, **with the
   stored titles shown** — and confirming each group is genuinely one posting.
+
+#### ✅ RULED 2026-09-08 — `postholdings` REGISTERED. The operator: *"ok"*, on being shown the cost.
+
+**This is the first registered shape whose collision had ALREADY been paid for in the tracker**,
+which makes its evidence stronger than PetSmart's and its cost concrete rather than forecast.
+
+- **The drift is THREE variants stacked on one requisition:** the per-brand iCIMS host
+  (`{brand}jobs-postholdings.icims.com`) versus the aggregate board
+  (`jobs.postholdings.com`); the `/careers-home` path prefix the aggregate board 302s to; and
+  a trailing `/login` on the login-gated page. All three normalize differently.
+- 🔴 **THE COST, ALREADY PAID: reqs 29572 and 31755 are each stored TWICE.** Tracked
+  2026-08-03 and 2026-08-18 on the iCIMS hosts, then **re-reported as new and persisted again
+  on 2026-09-04** under the aggregate host — with **byte-identical titles** both times. This is
+  the "resurfaces as new forever" failure, caught two persists in.
+- 🟢 **Identity proved at the SERVER, which is stronger than a title comparison:**
+  `jobs.postholdings.com/jobs/31166` returns the **Bob Evans** posting
+  `Sr. Manager, Consumer Insights`, whose only stored key is on
+  `bobevanssljobs-postholdings.icims.com`. **The aggregate board resolves ids that originate on
+  the brand subdomains, so the id space is provably SHARED ACROSS BRANDS** — a structural
+  guarantee, not an inference from matching titles. `/jobs/29572/login` returns the same posting
+  and title as `/jobs/29572`, so `/login` carries no identity. Garbage control `/jobs/99999999`
+  returns **404**, so the endpoint discriminates.
+- 🔴 **DELIBERATELY NARROWER THAN THE ULTA AND PETSMART SHAPES, WHICH FOLD ANY TRAILING SLUG.**
+  The extractor is anchored at the end and allows **only** nothing or `/login` after the id,
+  because that is exactly what the evidence covers. **Folding more than was proven is the
+  FALSE-NEGATIVE direction** — it silently suppresses distinct postings, which this section
+  forbids outright. If a slug form ever appears on this board, prove it and widen then.
+- 🔴 **iCIMS IS MULTI-TENANT and req ids are per-account, so the host family is pinned to the
+  `-postholdings.icims.com` SUFFIX.** This is the first shape to match a host *suffix* rather
+  than an exact host list; the suffix must be specific enough that only one employer's tenants
+  can match it. Folding across iCIMS accounts would collapse unrelated employers exactly as a
+  non-tenant-scoped Greenhouse fold would — pinned by Cotiviti cases in `REQID_UNREGISTERED`,
+  and note PetSmart's own three iCIMS hosts are already pinned out for the same reason.
+- **Validation (required again for any registry change):** collapse groups tracker-wide
+  **13 → 15**, both new groups verified **one title**; the 3 existing retitles
+  (Progressive `18060418`, Ulta `490486`, Ulta `500906`) unchanged; idempotent on a second pass;
+  **zero** stored keys the index cannot resolve; **zero** exact-URL regressions. Suite
+  **294 → 302**, the 4 positive cases confirmed **FAILING before the module changed**.
+- 🟢 **It fires immediately, unlike PetSmart's:** the aggregate form of Bob Evans `31166` reads
+  `exact=False` but `reqid_verdict=suppress`, so the third duplicate persist does not happen.
 
 #### ✅ RULED 2026-09-01 r2 — `petsmart` REGISTERED, on evidence the tracker could not supply
 
@@ -915,8 +957,16 @@ requisition, not a new opening. Same trap as Airbnb's 7702714, in the *gaining* 
 
 ## 4. Reporting
 
-One file per run at `matches/{date}.md`; `-r2`, `-r3` for same-day re-runs. **Never
-overwrite or append to an existing day's file.**
+One file per run at **`matches/{date}-r{N}.md`**, N starting at **1**: `2026-09-08-r1.md`, then
+`-r2`, `-r3` for same-day re-runs. **Never overwrite or append to an existing day's file.**
+
+🔴 **THE FIRST RUN OF A DAY IS `-r1`, NOT A BARE `{date}.md`** *(ruled 2026-09-08 on the
+operator's instruction: "let's make the day's first run match the others, r1, r2, r3, etc.")*.
+The bare form was the convention until then, which made the first run of each day **the only one
+whose filename did not say which run it was** — so a day's first report sorted and read
+differently from every other, and "is there an r1?" could not be answered from a directory
+listing. Existing bare-named reports were renamed in the same pass; `matches/` is gitignored and
+disposable, so nothing depended on the old names.
 
 Run order: **core + analyst across the company list AND Indeed first, borderline after.**
 

@@ -223,6 +223,22 @@ def _petsmart_reqid(url, host, path, query):
     return m.group(1) if m else None
 
 
+# Post Holdings, registered 2026-09-08. Anchored at the END and allowing ONLY nothing or a
+# trailing `/login` after the id.
+#
+# 🔴 Deliberately NARROWER than the Ulta/PetSmart shapes, which fold any trailing slug. The
+# server evidence here covers `/login` and the path/host variants and nothing else, and
+# folding more than was proven is the FALSE-NEGATIVE direction -- it silently suppresses
+# distinct postings, which rules.md S3 forbids outright ("never let dedup fail toward false
+# negatives"). If a slug form ever appears on this board, prove it and widen this then.
+_REQID_POSTHOLDINGS = re.compile(r"(?:/careers-home)?/jobs/(\d+)(?:/login)?/?$", re.I)
+
+
+def _postholdings_reqid(url, host, path, query):
+    m = _REQID_POSTHOLDINGS.search(path)
+    return m.group(1) if m else None
+
+
 DRIFT_SHAPES = [
     {
         "key": "adobe",
@@ -276,7 +292,55 @@ DRIFT_SHAPES = [
         "hosts": ("careers.petsmart.com",),
         "extract": _petsmart_reqid,
     },
+    {
+        # Registered 2026-09-08 under the rules.md S3 evidence check.
+        #
+        # THE DRIFT: THREE variants stack on one requisition -- the per-brand iCIMS host
+        # (`{brand}jobs-postholdings.icims.com`) vs the aggregate board
+        # (`jobs.postholdings.com`), the `/careers-home` path prefix the aggregate board
+        # 302s to, and a trailing `/login` on the login-gated page. All normalize
+        # differently, so exact-URL dedup missed.
+        #
+        # THE COST, ALREADY PAID: reqs 29572 and 31755 are each stored TWICE -- tracked
+        # 2026-08-03 and 2026-08-18 on the iCIMS hosts, then re-reported as new and
+        # persisted again on 2026-09-04 under the aggregate host, with BYTE-IDENTICAL
+        # titles. Unlike PetSmart, the collision IS visible in stored data.
+        #
+        # THE EVIDENCE (S3 requires identity, not plausibility), all live-server:
+        #   - `jobs.postholdings.com/jobs/31166` returns the BOB EVANS posting
+        #     `Sr. Manager, Consumer Insights`, whose only stored key is on
+        #     `bobevanssljobs-postholdings.icims.com`. The aggregate board resolves ids
+        #     that originate on the brand subdomains, so THE ID SPACE IS PROVABLY SHARED
+        #     ACROSS BRANDS -- a structural guarantee, not an inference from titles.
+        #   - `/jobs/29572/login` returns the same posting and title as `/jobs/29572`, so
+        #     `/login` carries no identity.
+        #   - Garbage control `/jobs/99999999` returns 404, so the endpoint discriminates.
+        #
+        # 🔴 iCIMS IS MULTI-TENANT and req ids are per-account, so the host family is
+        # pinned to the `-postholdings.icims.com` suffix. Folding across iCIMS accounts
+        # would collapse unrelated employers exactly as a non-tenant-scoped Greenhouse
+        # fold would -- pinned by the Cotiviti cases in REQID_UNREGISTERED.
+        "key": "postholdings",
+        "hosts": ("jobs.postholdings.com",),
+        "host_suffixes": ("-postholdings.icims.com",),
+        "extract": _postholdings_reqid,
+    },
 ]
+
+
+def _host_matches(host, shape):
+    """Exact host membership, plus an optional pinned SUFFIX family.
+
+    The suffix form exists for employers running one iCIMS account behind several branded
+    subdomains. It is a whitelist like everything else here: a suffix must be specific
+    enough that only one employer's tenants can match it.
+    """
+    if host in shape["hosts"]:
+        return True
+    for suffix in shape.get("host_suffixes", ()):
+        if host.endswith(suffix):
+            return True
+    return False
 
 
 def reqid_key(url):
@@ -294,7 +358,7 @@ def reqid_key(url):
     query = {k.lower(): v for k, v in parse_qsl(parts.query, keep_blank_values=False)}
 
     for shape in DRIFT_SHAPES:
-        if host not in shape["hosts"]:
+        if not _host_matches(host, shape):
             continue
         need = shape.get("path_must_contain")
         scoped = shape.get("tenant_scoped_hosts", shape["hosts"])

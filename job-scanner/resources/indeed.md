@@ -122,4 +122,4 @@ Indeed actively fights automated scraping (more aggressively than most single-em
 ## Files
 
 - `indeed_seen.json` — jobs already reported from this search. Same shape as `seen_jobs.json` but kept separate (key = `https://www.indeed.com/viewjob?jk={jobkey}`, value = `{title, company, location, dateFound}`).
-- Reported in `matches/{date}.md` under its own `## Indeed Search` heading, separate from the company-list matches sections — not merged into the same list.
+- Reported in `matches/{date}-r{N}.md` (first run of a day is `-r1`, changed 2026-09-08) under its own `## Indeed Search` heading, separate from the company-list matches sections — not merged into the same list.
