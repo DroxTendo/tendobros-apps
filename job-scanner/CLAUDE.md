@@ -116,6 +116,11 @@ it. Read that section first.
   must not reuse r1's), newest `KEEP_BACKUPS` kept, pruned only after the assertions pass.
   🔵 Never hardcode a tracker path: `jobscan_tracker.SEEN_JOBS` / `.INDEED_SEEN` resolve themselves
   from the module's own location, so they hold wherever the project sits and whatever the cwd is.
+  ⚠️ **Do NOT pass `date_stamp` to `save()`** *(learned 2026-09-07)*. It **overrides** the per-write
+  timestamp the 2026-09-06 change shipped and reverts the backup name to the coarser per-day form.
+  The guarantee survives either way — `_backup_path` suffixes a same-day re-run as `-02` — but the
+  override buys nothing and discards granularity that was added deliberately. **The default is
+  per-write, and that is the point: leave it alone.**
 - **🔴 A dedup hit is ALWAYS a suppress**, whatever the stored tag. Never re-report, re-litigate,
   promote, demote, or "correct" a stored entry.
 - **🔴 Non-US is a hard exclusion — but it is CRITERIA, never COVERAGE.** Decide it client-side after

@@ -291,7 +291,40 @@ of 3 characters or fewer, which must match a token **exactly**.
 
 - Prefix matching is what makes `Data Lead Engineer` and `Analytics Engineering Manager`
   match. It also catches glued forms like `DataOps Engineer`.
+  - ⚠️ **IT ALSO REACHES COMPOUND WORDS WHERE THE STEM IS NOT THE ROLE, AND THAT IS A
+    DIFFERENT MECHANISM FROM THE RECORDED CROSS-PHRASE ACCIDENTS** *(found live 2026-09-10 r3)*.
+    Tailscale's `Software Engineer, Networking (Dataplane)` reaches **core** on
+    `("data","engineer")` because **`Dataplane` starts with `data`** — a networking role,
+    auto-reported as core. Its sibling `Principal Product Manager (Dataplane)` reaches
+    borderline by the identical route.
+    - 🔵 **This is the RATIFIED prefix rule doing exactly what it was ratified to do, not a
+      defect.** The 2026-08-31 r3 ruling names prefix matching explicitly (*"`data` catches
+      'Database'"*) and the operator chose to keep it: *"It's OK, leave it, it's working as
+      expected."* Core carries no exclusions and they triage. **It was reported as core.**
+    - 🔴 **Recorded because the MECHANISM is new.** Every accident on record until now was
+      **cross-phrase** — `data` and `developer` arriving from two unrelated noun phrases
+      (Shopify's `Staff Product Data Scientist - Developer Productivity`). This one is a
+      **single compound token**, so the "different noun phrase" family of guards — already
+      tried and discarded — could never have reached it. **Do not re-derive that metric to
+      catch this.**
+    - ⚠️ **The same shape fires on any `data`-prefixed compound**: Datacenter, Databricks,
+      Dataplane, Dataverse. Cost today is one core row and one borderline row. If a guard is
+      ever wanted it needs its own measurement, and note that a `data` stem is what makes
+      `Database Engineer` a core match in the first place — the two cannot be separated by
+      shortening the stem.
 - The short-word rule is what stops `bi` firing on *Bilingual*, *Billing*, *Biology*, *Big*.
+  - ⚠️ **IT DOES NOT STOP HYPHENATED FORMS, AND THE RATIONALE ABOVE NEVER COVERED THEM**
+    *(found live 2026-09-09 r3)*. Tokenizing splits on **any non-alphanumeric run**, so
+    Marriott's `Bi-Plex Director of Food & Beverage` becomes `bi` + `plex` and the exact-token
+    guard has nothing to bite on — `bi` matches a real token. The recorded reasoning addresses
+    only the **prefix** cases (*Bilingual*, *Billing*), which is a different mechanism.
+    **The guard is correct as specified; the specification was incomplete.**
+  - 🔵 **Cost is currently zero and this is NOT a proposed change.** The one live instance
+    reached only borderline and was judged away, so no fix is warranted on today's evidence —
+    it is recorded so a future run does not read it as the short-word rule failing, and so
+    that anyone tempted to "harden" `bi` knows the prefix argument does not answer this case.
+    A hyphen-aware guard would need its own measurement: `Bi-Weekly`, `Bi-Lingual` and
+    `Bi-Annual` are all plausible title shapes on these boards.
 - Note the asymmetry, which is correct: `analytics` does **not** satisfy `analyst`, so
   `Data Analytics Manager` is not a Data Analyst match.
 
@@ -487,6 +520,49 @@ understand itself** — dashboards, KPIs, metrics, self-service analytics — is
 - 🔵 **Seniority is still never a reason to demote** — `Lead Analyst` was not why this was judged
   away, and a lead/manager title that only reaches borderline stays borderline rather than routing.
 
+#### ✅ RULED 2026-09-12 — A DATABASE ADMINISTRATOR TITLE IS **OUT OF SCOPE** AND IS JUDGED AWAY. THE ITEM IS CLOSED.
+
+The operator, asked directly after the question had run three times unruled:
+***"'database administrator' no, I don't want to see"***.
+
+**A title whose HEAD NOUN is the database-administrator / administrator role is judged away at
+borderline.** DBA is a database-**operations** track and matches none of the five things this
+section asks the tier to be judged against — data engineering, analytics engineering, data
+analysis, data modeling, BI.
+
+- 🔴 **THIS IS A BORDERLINE JUDGEMENT PRECEDENT AND MUST NEVER BE IMPLEMENTED AS AN EXCLUSION.**
+  Same form as the 2026-09-03 regulatory-reporting ruling. No token is banned, `bin/jobscan_match.py`
+  is **unchanged**, and the borderline net still surfaces these titles for judgement every run — as
+  it must, since `database` appears in genuine data titles. **`rules.md` §1 still has exactly ONE
+  exclusion: the early-career family.**
+  - 🔵 **Why a precedent is sufficient, verified against the module rather than assumed:**
+    `classify()` returns `borderline_candidate` for both `Sr. Database Administrator` and
+    `Administrator, Epic Operational Database`, and **no DBA-headed title can clear the core or
+    analyst bar** — "Administrator" is not in the head-noun set (Engineer, Analyst, Developer,
+    Modeler, plus Architect on the BI spellings). So every instance reaches judgement, and
+    judgement alone fully implements the ruling. An exclusion would add risk for no reach.
+- 🔴 **THIS SETTLES THE QUEST/COMCAST TENSION, AND IT SETTLES IT AGAINST THE QUEST HANDLING.**
+  Quest's `Administrator, Epic Operational Database` rows were **reported** on 2026-09-11 r1 while
+  Comcast's `Sr. Database Administrator` was judged away on the same run. **The Comcast handling was
+  the correct one.** Quest-shaped rows are judged away from now on.
+  - 🔴 **The already-reported Quest rows STAY REPORTED AND STAY STORED.** §3 is absolute: a stored
+    entry is never re-litigated, promoted, demoted or "corrected". They simply will not resurface —
+    dedup suppresses them from here on. Do not go back and retag them.
+- ⚠️ **THE BOUNDARY IS THE HEAD NOUN, and getting this wrong in the other direction would be
+  expensive.** `Database Engineer` is **core** (`classify()` confirms it) and stays core;
+  `database` remains a qualifying token at every company; and the 2026-08-26 reversal of the old
+  *"Database is not data; DBRE is SRE work"* gloss is **untouched** — Adobe's
+  `Sr. Database Reliability Engineer` still reaches borderline and is still judged on its merits.
+  **Apply the standing strip test:** if what remains after the domain words is an Engineer /
+  Analyst / Developer / Modeler / BI-Architect role, the mechanical bar decides and this precedent
+  does not apply.
+- ⚠️ **Do NOT count a mechanically-core title as an instance of this ruling.** United Health's
+  `Senior Data Engineer (DBA)` was reported as **core** on 2026-09-12: it clears the core bar on
+  `data engineer`, and the parenthetical `(DBA)` is not a tier decision at all.
+- 🔵 **Cost: one to two rows per run.** Ruled from the record rather than waiting for a run where
+  Quest and Comcast both serve one — that co-occurrence had already failed to happen three times,
+  while the inconsistency accumulated in the tracker.
+
 **Seniority is never a reason to demote — EXCEPT the two excluded words.** Strip the
 seniority word from the title and ask whether what remains is a data role. Lead, Director,
 Principal, Senior, Staff, Junior, Associate, VP, Head of — all fine, they decide whether to
@@ -496,6 +572,109 @@ apply.
 now excluded outright at the top of this section and never reach judgement. This is a
 deliberate reversal of the 2026-08-20 "seniority is not a filter in either direction"
 ruling — see `profile.md`, which records the same reversal.
+
+### ✅ RULED 2026-09-12 — THE 2026-08-26 NAMED-TECHNOLOGY RULING IS **WITHDRAWN**. THE ITEM IS CLOSED AND THE SHIPPED BAR IS CORRECT AS-IS.
+
+The operator, shown both halves and the measured cost:
+***"let's just remove that rule entirely, it's fine"***.
+
+**So the 2026-08-30 mechanical rewrite DID supersede the 2026-08-26 ruling, and it did so
+correctly.** The ambiguity recorded below is resolved in favour of the rewrite.
+
+- 🟢 **ZERO CODE CHANGE, and that is the point — the ruling was never implemented, so withdrawing it
+  ratifies the shipped module exactly as it stands.** Verified against `bin/jobscan_match.py` on
+  2026-09-12 rather than assumed:
+  - `aws` `azure` `gcp` `docker` `kubernetes` `k8s` `terraform` are in **no** item list, so
+    `classify('Cloud Engineer')` and `classify('DevOps Engineer')` both return **`None`**. **That is
+    now the ruled-correct outcome.**
+  - `snowflake` `sql` `spark` `tableau` `etl` `dbt` `databricks` `kafka` `hadoop` remain
+    **borderline** items. The withdrawn ruling wanted them *core*; withdrawing it leaves them
+    exactly where they are. They are still **reported**, in the Borderline table.
+  - `python` is absent from every item list, and stays absent.
+- 🔴🔴 **THE ENUMERATION NET DOES NOT CHANGE. DO NOT REMOVE THE CLOUD TOKENS FROM IT.** `CLAUDE.md`
+  is explicit that *criteria changes must never shrink the sweep*, and the net's job is to **find**,
+  not to decide. The six cloud tokens stay in the mandated net in `implementation.md`.
+- 🔴 **THE "SILENT LOSS" READING IS HEREBY CLOSED — DO NOT RE-RAISE IT.** This item was opened
+  because the net was wider than the bar: the net finds a `Cloud Engineer`, the bar drops it, and it
+  appears in **no bucket at all**. **That asymmetry is now INTENTIONAL, not a defect.** A net wider
+  than the bar is the safe direction — it is the *bar* wider than the net that loses postings
+  silently, which is what `test_jobscan.py::check_core_items_are_net_anchored` exists to prevent.
+  **A future run finding infra titles reaching no tier has found the ruled behaviour, not a bug.**
+- 🔵 **What the operator was shown before ruling:** 6 US-eligible instances measured across three
+  runs at two independent groups — the same two Easy Dynamics requisitions (`Cloud Engineer`,
+  `DevOps Engineer (Secret Clearance)`, both `Remote (United States)`) recurring on consecutive
+  runs, plus Comcast `Software Engineer 3 - Kubernetes Platform Management` and Sysco
+  `Cloud Engineer(GCP)`. All infra roles. They were also shown that the data-stack half is far
+  larger but moves titles only between two **reported** tiers, and chose to drop the whole rule
+  rather than split it.
+- ⚠️ **This does NOT touch the OTHER 2026-08-26 ruling, which stands: `database` is a QUALIFYING
+  TOKEN and the org-context test is retired.** The two shipped on the same day and are separate.
+  Adobe's `Sr. Database Reliability Engineer` still reaches borderline. See the DBA ruling above for
+  where the database family lands at judgement.
+
+---
+
+#### 📜 HISTORY — the item as raised, kept as provenance and NOT as current policy
+
+⚠️ **Everything below is SUPERSEDED by the withdrawal above.** It is retained because the
+measurement is real and is what the ruling was decided against.
+
+##### ⚠️ was OPEN — does the 2026-08-26 NAMED-TECHNOLOGY ruling survive the 2026-08-30 rewrite? *(raised 2026-09-11, ruled 2026-09-12)*
+
+**The ruling is not in this file at all, and `bin/jobscan_match.py` does not implement it.** It is
+recorded only in `implementation.md`. The operator, 2026-08-26: *"if it lists tech such as
+snowflake, sql, python, core it, if it's more cloud based like aws/azure/docker/kubernetes
+borderline it."*
+
+Checked against the shipped module on 2026-09-11:
+
+| Ruled | Shipped |
+|---|---|
+| `aws` `azure` `gcp` `docker` `kubernetes` `terraform` → **borderline** | in **neither** `CORE_ITEMS` nor `BORDERLINE_ITEMS` — not implemented at all |
+| `snowflake` `sql` `python` `spark` `tableau` `etl` … → **core** | `snowflake` `sql` `spark` `tableau` `etl` are **borderline** items; `python` is absent |
+
+🔴 **The cloud half fails in the SILENT-LOSS direction, which is why it is worth raising even
+though today's cost is ~zero.** The mandated enumeration net in `implementation.md` carries all six
+cloud tokens **specifically so the bar can see these titles** — so the net finds them, the bar drops
+them, and nothing appears in any bucket. That is the "a widened bar must widen the net" rule running
+backwards: the net is wider than the bar, and the gap is invisible by construction.
+
+⚠️ **It is genuinely ambiguous, and that is the question — not which of the two is "right".** This
+file was rewritten **2026-08-30, four days AFTER the ruling**, to a mechanical bar, and it does not
+mention named technologies anywhere. **Where this file and a note elsewhere disagree, this file
+wins**, so the rewrite may have superseded the ruling deliberately. But the rewrite's stated purpose
+was removing *exclusions*, not narrowing the tier bars, and nothing on record says the technology
+bar was considered during it.
+
+🔵 **SECOND GROUP'S EVIDENCE, 2026-09-11 r2 — G5 adds two more US-eligible instances**, so this is
+no longer one group's measurement: Easy Dynamics `Cloud Engineer` and `DevOps Engineer (Secret
+Clearance)`, both `Remote (United States)`, both reaching **no tier and no bucket at all**. The net
+finds them, the bar drops them, nothing appears in any output — the silent-loss direction, now
+observed at two independent groups. Running total of US-eligible instances measured: **4**. Still
+not a board-wide measurement, which is what this item wants before anything moves.
+
+🔵 **REPRODUCED 2026-09-12 ON THE SAME TWO REQUISITIONS — running total of US-eligible instances
+now 6.** Easy Dynamics served `Cloud Engineer` and `DevOps Engineer (Secret Clearance)` again,
+both `Remote (United States)`, both again reaching no tier and no bucket. 🔴 **The value of this
+instance is that it is a REPEAT, not a new sighting**: these two requisitions have now been found
+and dropped on two consecutive runs, so the loss is **recurring on specific known postings**, not a
+one-off pair. That is the Shopify-shaped permanent-recurring-cost distinction this file draws
+elsewhere, and it strengthens the case for closing the item in one direction or the other. Module
+untouched in-run, as required. ⚠️ **Still not the board-wide measurement this item asks for** —
+three runs of single-group spot measurements do not substitute for it, and the larger half (whether
+`snowflake`/`sql`/`spark`/`tableau`/`etl` move from borderline to core) remains entirely
+unmeasured.
+
+🔵 **Measured before raising it, on G3's 15 boards: 3 titles, 2 US-eligible** — Comcast
+`Software Engineer 3 - Kubernetes Platform Management`, Sysco `Cloud Engineer(GCP)`, and an Adobe
+`…(Java, Scala, K8s)` title that is non-US. All three are infra roles that the operator would
+almost certainly triage away, so **the practical cost today is approximately zero** — this is a
+consistency question, not a lost-matches emergency.
+
+**Nothing was changed in-run** (the module is never widened mid-scan). Before anything moves this
+wants a **board-wide** measurement of both halves, since the data-stack half — promoting `snowflake`
+/ `sql` / `spark` / `tableau` / `etl` from borderline to core — is far larger than the cloud half
+and would move titles between two *reported* tiers rather than into the report.
 
 ### Consequences of the 2026-08-30 rewrite, recorded so they are not read as bugs
 
@@ -662,6 +841,61 @@ posting; it does not exempt a posting from **dedup**, which is a different axis 
 which §3 makes absolute. A tracked posting is suppressed whether it resolves US, non-US or
 AMBIGUOUS. Under that reading this section is untouched and §4's order already says so.
 
+🔴 **IT FIRED ON A CORE TITLE FOR THE FIRST TIME ON 2026-09-09 r3, AND MOZILLA IS AGAIN THE STRUCTURAL CASE.** Mozilla `Senior Staff Data Engineer` (Greenhouse `8180971`) is served with a
+bare `Remote` location → AMBIGUOUS, and is an **exact-URL dedup hit**. Every prior instance —
+the 11 on 2026-09-04, the 9 at G4b this run — reached only borderline or analyst. **Under the
+pass-through order it suppressed correctly; a short-circuiting order would have re-reported a
+tracked CORE posting as new**, which is the most visible possible form of the failure and the
+one most likely to be mistaken for a genuine find. The interim handling is now load-bearing on
+the tier the operator actually reads first.
+
+🔴 **IT FIRED ON CORE TITLES AGAIN ON 2026-09-10 r2, AT THREE EMPLOYERS, AND MOZILLA IS THE
+STRUCTURAL CASE FOR A SECOND CONSECUTIVE RUN.** Mozilla again served `Senior Staff Data Engineer`
+as three per-location postings (`Remote US` → US/tracked, bare `Remote` → **AMBIGUOUS**/tracked,
+`Remote Canada` → non-US). Alongside it, **Jellyvision and Digible served bare-`Remote` Greenhouse
+postings resolving AMBIGUOUS, two of the three CORE**, and all were exact-URL dedup hits. Under the
+pass-through order every one suppressed correctly. 🔵 **This is now the second run running in which
+the interim order was load-bearing on the tier the operator reads first** — and the bare-`Remote`
+Greenhouse shape means the exposure is structural across small boards, not particular to Mozilla.
+
+🔴 **THIRD CONSECUTIVE RUN LOAD-BEARING, 2026-09-10 r3 — AND THE EXPOSURE IS NOW FOUR EMPLOYERS
+WIDE.** Mozilla's three-way per-location split again, Alpaca's region-word remote strings (most of
+9 AMBIGUOUS records), and the bare-`Remote` Greenhouse postings at **Jellyvision and Digible**.
+Every one was an exact-URL dedup hit and every one suppressed correctly under the pass-through
+order. 🔵 **Three runs is no longer a run of luck** — the bare-`Remote` Greenhouse shape is
+structural across small boards, and the interim order has now been the thing standing between the
+report and a re-reported tracked CORE posting on two of those three runs. **The registration case
+for ruling this is stronger each run; the interim handling has never once been wrong.**
+
+🟢 **FOURTH CONSECUTIVE RUN LOAD-BEARING, 2026-09-11 r1 — AND THE EXPOSURE REACHED SEVEN
+EMPLOYERS** *(homed here 2026-09-12 during the corrections fold, where it had been living only in
+an index — which is why the run sequence in this section previously jumped from "third" straight to
+"fifth")*: **Alpaca, Shopify, Mozilla, Airbnb, Jellyvision, Digible and Ross.** Every AMBIGUOUS
+record passed through dedup and suppressed correctly. 🔵 **The unbroken run count is the whole
+registration argument, so a missing entry in this sequence is not a cosmetic gap** — it is the
+evidence thinning out.
+
+🔴 **FIFTH CONSECUTIVE RUN LOAD-BEARING, 2026-09-11 r2 — AND THE LARGEST CORE EXPOSURE YET.**
+Four employers fired independently and **three of the four carried CORE titles**: **Alpaca** (9
+AMBIGUOUS post-bar candidates, all exact-URL dedup hits, **six of them core**), **Shopify** (15
+AMBIGUOUS rows through dedup, **8 core/lead_manager**), **Jellyvision** (6/6 bare `Remote`) and
+**Digible**. Every one suppressed correctly under the pass-through order; a short-circuiting order
+would have re-reported **at least fourteen tracked core-tier postings as new** in a single run.
+🔵 **Five runs, seven-plus employers, never once wrong.** The bare-`Remote` Greenhouse shape and
+Alpaca's region-word remote strings are both structural, not incidental — **the registration case
+is now stronger than the case for leaving this open.**
+
+🔴 **SIXTH CONSECUTIVE RUN LOAD-BEARING, 2026-09-12 — FIVE EMPLOYERS, AND ALPACA IS NOW THE
+LARGEST SINGLE CORE EXPOSURE.** **Alpaca** produced 9 of 10 candidates AMBIGUOUS, **5 core + 1
+analyst**, every one a stored exact-URL hit; **Mozilla**'s bare-`Remote` `Senior Staff Data
+Engineer` fired for a third consecutive run; **Jellyvision** (`Senior Analytics Engineer`, core),
+**Digible** (2 rows) and **Shopify** all repeated their documented shapes. Every one suppressed
+correctly under the pass-through order. 🔵 **Alpaca's hint-list gap grew by four members this run**
+— `Remote - Americas`, `Remote - North America`, `North America and Europe`, `Remote - Global
+Anywhere` — so the AMBIGUOUS population on that board is **widening**, which makes the order
+load-bearing on more rows each run rather than fewer. Note `Remote - North America` resolves
+AMBIGUOUS while `Remote - North America - EU - UK` resolves non-US on the same board.
+
 ⚠️ **Until ruled, keep the pass-through order.** It is the recoverable direction: a wrongly
 suppressed ambiguous row is one already-seen posting not shown again, while the alternative
 re-reports known postings **every run, indefinitely** — the Shopify-shaped permanent recurring
@@ -701,19 +935,65 @@ this section retired on the operator's instruction**, so they cannot be closed b
 
 | Shape | Stored form | Served form | Status |
 |---|---|---|---|
-| **Adobe dual-scheme** | `careers.adobe.com/us/en/job/{req}/{slug}` | `adobe.wd5.myworkdayjobs.com/…/{slug}_{req}` | OPEN |
-| Pantheon cross-host Greenhouse | `job-boards.greenhouse.io/pantheon/jobs/{req}` | `pantheon.io/about/careers/detail?gh_jid={req}` | OPEN |
-| Ulta iCIMS path prefix | `careers.ulta.com/jobs/{req}` | `careers.ulta.com/careers/jobs/{req}` | OPEN |
-| Ulta trailing-slug + retitle | `…/jobs/{req}/{slug}` | `…/jobs/{req}` | OPEN |
-| Progressive slug drift | — | — | OPEN |
+| **Adobe dual-scheme** | `careers.adobe.com/us/en/job/{req}/{slug}` | `adobe.wd5.myworkdayjobs.com/…/{slug}_{req}` | ✅ **FOLDED — this row read OPEN until 2026-09-10 and was STALE** |
+| Pantheon cross-host Greenhouse | `job-boards.greenhouse.io/pantheon/jobs/{req}` | `pantheon.io/about/careers/detail?gh_jid={req}` | ✅ **FOLDED — this row read OPEN until 2026-09-11 and was STALE** |
+| Ulta iCIMS path prefix | `careers.ulta.com/jobs/{req}` | `careers.ulta.com/careers/jobs/{req}` | ✅ **FOLDED — stale `OPEN` corrected 2026-09-11** |
+| Ulta trailing-slug + retitle | `…/jobs/{req}/{slug}` | `…/jobs/{req}` | ✅ **FOLDED — stale `OPEN` corrected 2026-09-11** |
+| Progressive slug drift | `…/jobs/{req}/{slug-A}` | `…/jobs/{req}/{slug-B}` | ✅ **FOLDED — stale `OPEN` corrected 2026-09-12; `reqid_key()` returns `('progressive','18060418')` for both stored slug forms and `progressive` is registered in `DRIFT_SHAPES`** |
 | Scopely `?gh_jid=` restating the path | — | — | fixed |
 | Adobe `/apply` suffix | — | — | fixed |
 | **Post Holdings brand-host + `/careers-home` + `/login`** *(2026-09-08)* | `{brand}jobs-postholdings.icims.com/jobs/{req}/login` | `jobs.postholdings.com/{careers-home/}jobs/{req}` | **fixed — `postholdings` registered; 2 requisitions had already double-persisted** |
-| **Humana req-first** *(new 2026-09-02)* | `careers.humana.com/us/en/job/{REQ}/{Slug}` | req-last, on both the public and Workday forms | OPEN |
+| **CVS dual-scheme (Phenom ↔ Workday)** *(new 2026-09-08 r3)* | `jobs.cvshealth.com/us/en/job/{REQ}/{Slug}` | `cvshealth.wd1.myworkdayjobs.com/CVS_Health_Careers/job/{Loc}/{Slug}_{REQ}` | OPEN |
+| **CVS Workday location-segment drift** *(new 2026-09-08 r3)* | `…/job/RI---Woonsocket/{Slug}_{REQ}` | `…/job/NY---Work-from-hom/{Slug}_{REQ}` | OPEN |
+| **Cigna dual-scheme (Phenom ↔ Workday)** *(new 2026-09-09 r3)* | `jobs.thecignagroup.com/us/en/job/{REQ}/{Slug}` | `cigna.wd5.myworkdayjobs.com/cignacareers/job/{Loc}/{Slug}_{REQ}` | OPEN — **7 of 8 requisitions have ALREADY double-persisted; 1 live exposure** |
+| **Humana req-first** *(new 2026-09-02)* | `careers.humana.com/us/en/job/{REQ}/{Slug}` | req-last, on both the public and Workday forms | OPEN — **SECOND live false positive 2026-09-10 r2** (`R-422722`, byte-identical title); re-verified against `reqid_key()` on r2 **and again on r3**, still `None` for both forms. **r3 exposure re-derived: 20 Phenom keys, 13 of them req-first, against 54 `humana.wd5` keys; no third false positive this run** |
 | **Jellyvision dual-scheme Greenhouse** *(new 2026-09-02)* | `job-boards.greenhouse.io/jellyvision/jobs/{req}` | `www.jellyvision.com/about-us/careers/apply/?gh_jid={req}` | OPEN |
 | Pfizer dual-scheme *(2026-09-01 r2)* | `www.pfizer.com/about/careers/job/{req}` | CXS `…_{req}-2` | OPEN |
 | United Health Radancy *(2026-09-01)* | stable numeric id, drifted slug **and** title | — | OPEN |
-| Comcast `wd5` ↔ `wd115` | `comcast.wd5…` | `comcast.wd115…` | OPEN, **must not fold** |
+| Comcast `wd5` ↔ `wd115` | `comcast.wd5…` | `comcast.wd115…` | OPEN, **must not fold** — 🔴 **FIRST LIVE FALSE POSITIVE 2026-09-11 r2** (`R442342`, byte-identical title, stored `status: borderline`); `reqid_key()` re-verified `None` on both hosts. Backlog 1 → **2** |
+| **American Express dual-host** *(new 2026-09-10)* | `careers.americanexpress.com/en/sites/CX_1/job/{Id}` (75 keys) | `egug.fa.us2.oraclecloud.com/hcmUI/…/CX_1/job/{Id}` (14 keys) | OPEN — `reqid_key()` returns `None` for both; **cost zero so far, by the same accidental immunity Post Holdings and Cigna had**. 🔵 **r3: all 8 new AmEx candidates tested against BOTH host forms and against all 90 stored AmEx-family keys by req id — 0 collisions.** Tested, not assumed, for a second consecutive run |
+| **Ross GUID re-mint on re-post** *(new 2026-09-10)* | `{guid-A}` | `{guid-B}`, same posting | OPEN — not a host or path drift: **the record GUID itself is re-minted**, so no path rule can reach it. `Data Analytics Manager - Supply Chain` is stored under two GUIDs; cost zero, both tracked. 🔵 **r3: did not fire on a candidate for a third consecutive run, and board membership stopped drifting for the first time in four runs** (same three empty-location GUIDs as 2026-09-09 r3) |
+
+> 🔴 **THE ADOBE ROW WAS STALE FOR AN UNKNOWN NUMBER OF RUNS AND MIS-BRIEFED 2026-09-10 r1.**
+> It read `OPEN` while `DRIFT_SHAPES['adobe']` had **both** hosts registered — `reqid_key()`
+> returns `('adobe','R171398')` for the Phenom and the Workday form alike. A dispatch brief
+> written from this table told a group to treat a folded shape as open; the group checked `bin/`
+> and applied no hand fold, which is the correct handling and is the only reason it cost nothing.
+>
+> 🔵 **`bin/` is authoritative over this table. When they disagree, the table is the thing that is
+> wrong** — and note what makes this hard to notice: the same check run on the same day found
+> Cigna, CVS and Humana all genuinely returning `None`. **The table was right about three shapes
+> and stale about one.** Re-verify a row against `reqid_key()` before briefing a group from it;
+> it is three lines of Python, and "OPEN" is a claim about code, not about prose.
+>
+> 🔴 **IT WAS THREE MORE ROWS, NOT ONE — FOUND 2026-09-11 BY APPLYING EXACTLY THAT RULE.** Pantheon
+> and **both** Ulta rows were also stale `OPEN`: `reqid_key()` returns `('pantheon','8056205')` for
+> both Pantheon forms and `('ulta','490486')` for all three Ulta forms, and every one of them is
+> registered in `DRIFT_SHAPES`. **`implementation.md` recorded them correctly throughout** — the
+> registration ruling below names `ulta` and `pantheon` in its own registered list, on this page,
+> four screens down. **So the table contradicted its own section, not just the code.**
+>
+> 🔵 **Four stale rows across two runs is a property of the TABLE, not of any one row** — and this
+> table is the standing input to every dispatch brief. The status column is hand-maintained prose
+> about code that changes underneath it. **Re-verify every row you brief from, every run.** On
+> 2026-09-11 nine rows were re-verified: three were stale (above), and the five confirmed genuinely
+> OPEN were Jellyvision, AmEx dual-host, Comcast `wd5`↔`wd115`, Humana req-first and Cigna.
+>
+> 🔴 **FIFTH STALE ROW, 2026-09-12: PROGRESSIVE.** `reqid_key()` returns
+> `('progressive','18060418')` for both stored slug forms and `progressive` has been in
+> `DRIFT_SHAPES` since the 2026-08-31 r3 registration — which **this section's own ruling names in
+> its registered list**, four screens down, exactly as with Pantheon and Ulta. Five stale rows
+> across three runs; the count of re-verifications that found staleness is now larger than the
+> count that found a row correct, which is the strongest possible argument for verifying rather
+> than briefing from this column.
+>
+> ⚠️ **BUT `reqid_key()` ALONE IS NOT A SUFFICIENT RE-VERIFICATION, AND 2026-09-12 FOUND THE
+> COUNTER-EXAMPLE.** Scopely's `?gh_jid=`-restating-the-path shape is correctly recorded as
+> `fixed` — it is handled in `normalize_url()`, **not** by a `DRIFT_SHAPES` registration — so
+> `reqid_key()` returns `None` there. A checker that reads `None` as "open" would report a working
+> fix as broken, which is the mirror of the stale-`OPEN` error and would send a group hunting a
+> defect that does not exist. 🔵 **Re-verify against the mechanism the row actually claims:**
+> `normalize_url()` for a `fixed` row, `reqid_key()` for a registered fold.
 
 > 🔴 **The two shapes found 2026-09-02 are worth reading together — one cost something and one did not, for the same structural reason.**
 >
@@ -729,11 +1009,83 @@ this section retired on the operator's instruction**, so they cannot be closed b
 >   unrelated employers) but means every new Greenhouse dual-scheme employer needs its own
 >   registration.
 >
+> 🔴 **THE TWO CVS SHAPES ADDED 2026-09-08 r3 ARE WORTH READING TOGETHER — ONE COST A ROW AND ONE COST NOTHING, AND THE SECOND IS THE MORE INTERESTING.**
+>
+> - **The dual scheme cost a reported row.** `R0903832` has been tracked since 2026-08-02 on the
+>   Phenom host and is served on the Workday host under a different scheme, with a
+>   **byte-identical title** — pure URL drift, not a repost. Exact-URL dedup cannot see it, so it
+>   surfaced as new core. Handled per this section's standing in-run rule: **reported flagged,
+>   persisted, `jobscan_dedup` untouched**, which ends the recurrence for that one requisition.
+>   Structurally identical to the Adobe and Pfizer dual schemes.
+> - **The location-segment shape is a different animal and is NOT a dual scheme.** The *same* host
+>   and *same* scheme serve a requisition under a **different location path segment** when its
+>   primary location changes — `R1014400` at `NY---Work-from-hom` against a stored
+>   `RI---Woonsocket`. `normalize_url()` folds the Workday `-N` revision suffix but not the
+>   location segment, and it must not: **a location segment is not cosmetic drift in general**, and
+>   folding it blindly would be the false-negative direction this section forbids. It cost nothing
+>   this run only because that requisition's title is judged away. ⚠️ **A registration here would
+>   need its own evidence run — the id is already in the path, so the safe extractor is the req id
+>   with the location segment ignored, but that is exactly the "fold more than was proven" hazard
+>   the Post Holdings ruling warns about.**
+>
+> 🔵 **Tracker exposure, re-derived rather than inherited: 4 `jobs.cvshealth.com` keys against 109
+> `cvshealth.wd1` keys.** The Phenom-side minority is what makes the dual scheme low-cost today
+> and is also why it went unnoticed — most of the board is already stored on the Workday side.
+>
 > 🔴 **Pfizer, United Health and Comcast's survivor share a defect the persist-the-drifted-URL
 > fix CANNOT reach: their affected postings are non-US, and a non-US posting is never
 > persisted.** So there is nothing to write, and the shape recurs every run indefinitely. This
 > is the one case where "persist it and the recurrence ends" is structurally false — **it is an
 > argument for registration, not for waiting.**
+
+> 🔴 **CIGNA, FOUND 2026-09-09 r3, IS THE THIRD PHENOM↔WORKDAY DUAL SCHEME — AND THE SECOND WHOSE COST WAS ALREADY PAID BEFORE ANYONE LOOKED.**
+>
+> Structurally identical to the ruled `postholdings` shape and the open CVS one. **Seven of the
+> eight stored `jobs.thecignagroup.com` requisitions are ALSO stored under a `cigna.wd5` key for
+> the same req id** — 26001732, 26003484, 26004955, 26005211, 26007037, 26008414, 26008707 —
+> each persisted twice, several with byte-identical titles.
+>
+> - 🔴 **One live exposure: `26007414` is stored ONLY on the Phenom host**, so it resurfaces as
+>   new the first time it is served on the Workday side. The other seven cost nothing *only
+>   because both keys are already stored* — the same accidental immunity Post Holdings had, and
+>   the same reason it went unnoticed.
+> - 🔵 **This is now a PATTERN across three employers, not three coincidences.** Phenom front
+>   ends over a Workday tenant (Adobe, CVS, Cigna, Humana) reliably serve both schemes, and
+>   exact-URL dedup cannot see across them. **Whenever `companies.md` records "Custom (Phenom),
+>   underlying Workday", assume this shape is present until measured.** That is a cheaper check
+>   than waiting for a double-persist to surface.
+
+> ### 🔴 RE-MEASURED 2026-09-10 r2 — FOUR ROWS CHECKED AGAINST `reqid_key()` RATHER THAN INHERITED, AND THE HUMANA ROW COST A SECOND ROW
+>
+> The 2026-09-10 r1 lesson ("`OPEN` is a claim about code, not about prose") was applied: every row
+> a group relied on this run was re-verified against the module before being briefed or acted on.
+>
+> - 🔴 **HUMANA PRODUCED ITS SECOND LIVE FALSE POSITIVE.** `R-422722`
+>   (`Lead Cloud & Data Platform Engineer`) is tracked on the Phenom host with a **byte-identical
+>   title** and was served on the Workday host, so it surfaced as a new `lead_manager` row.
+>   Handled per the standing in-run rule — **reported flagged, persisted, `jobscan_dedup`
+>   untouched** — which ends the recurrence for this one requisition and leaves the other ~12
+>   req-first Humana keys as a standing false-positive source. **Two false positives from one
+>   unruled shape is now the strongest registration case on this table after Adobe's.**
+> - 🔵 **CIGNA's exposure re-derived rather than carried forward: 8 Phenom keys against 76
+>   `cigna.wd5` keys** (r3 recorded 8 against an unstated Workday count). `reqid_key()` still
+>   returns `None` for both hosts. **Cost zero this run — Cigna produced no new rows at all.**
+> - 🟢 **PFIZER's row now has a requisition attached to it, which it never had before.** All four
+>   stored public reqs are public-**only** (zero double-persisted, unlike Cigna and Post
+>   Holdings), and exactly one — **`4961433` `Data Integration & Systems Senior Engineer`** — is
+>   on the CXS board today: **core tier, non-US (Dalian)**, so it drops at the location filter and
+>   leaves nothing to persist. **This is the "persist it and the recurrence ends is structurally
+>   false" case, now confirmed with an id rather than argued from a pattern.**
+> - 🔵 **ROSS's GUID re-mint did not fire** — `Data Analytics Manager - Supply Chain` was served
+>   under a single GUID (`26615759`, the older of the two stored) and suppressed exact. Second run
+>   at zero cost, and still unreachable by any path rule, since the identifier itself is what
+>   changes.
+> - 🔵 **AMERICAN EXPRESS was checked rather than assumed.** The run's new AmEx core row was tested
+>   against **both** host forms and against every stored key carrying its req id before being
+>   called new. The dual-host shape did not fire; cost stays zero, and it stays open.
+> - Handled per the standing in-run rule below: reported flagged, persisted, `jobscan_dedup`
+>   untouched. **Registration needs its own evidence run** — the identity must be proved at the
+>   server, as it was for Post Holdings, not inferred from matching titles.
 
 🔴 **DURING A SCAN THE HANDLING IS: REPORT IT FLAGGED, PERSIST IT, AND DO NOT TOUCH
 `jobscan_dedup`.** A dispatch group must not widen normalization mid-run. On r3 two groups
@@ -835,6 +1187,66 @@ recur on any shape whose drifted form was never persisted.
 - 🔴 **Greenhouse-style multi-tenant hosts must be tenant-scoped.** The `pantheon` shape
   requires the tenant in the path on `job-boards.greenhouse.io`, or the fold would collapse
   unrelated employers sharing a req number. Pinned by a test.
+
+#### 🔴 THE RETITLE PROTECTION CANNOT FIRE ON A **STABLE URL**, AND THAT IS STRUCTURAL *(found 2026-09-11 at Nationwide)*
+
+Every retitle on record until now arrived with a **changed URL**, and the recipe below is written on
+that assumption — `reqid_verdict()` is reached only in the `else` branch, *after* `is_seen()` has
+already missed.
+
+**Nationwide req `098972` retitled ACROSS A TIER BOUNDARY under a byte-identical URL.** Stored
+2026-08-21 as `Senior Investment Analyst, Real Estate Information Management`, which `classify()`
+returns **`None`** for; served now as `Senior Investment Data & Reporting Analyst - Real Estate
+Investments`, which classifies **`analyst`**. The URL never changed, so `is_seen()` short-circuits
+and the retitle machinery **is never consulted at all.**
+
+- 🔴 **It was suppressed, and that is correct.** §3 is absolute: a dedup hit is ALWAYS a suppress,
+  whatever the stored tag, and a stored entry is never re-litigated or promoted. This is recorded as
+  a **mechanism**, not as a defect to fix in-run.
+- ⚠️ **Note what it costs and what it does not.** The 2026-08-31 r3 ruling exists to stop a *fold*
+  silently swallowing a retitle — it is about req-ID keying, and it does exactly that job. This case
+  never reaches a fold, because exact-URL dedup already matched. **A title that gains a data word
+  under a stable URL is invisible to the report by design**, the same way Progressive `18060418`
+  would have been had its slug not moved with its title.
+- 🔵 **The direction is safe** — it suppresses a posting the operator has already been shown, rather
+  than re-reporting or losing a new one. Recorded so a future run does not read it as the retitle
+  rule failing.
+
+##### 🔴 RE-MEASURED 2026-09-12 — IT IS NOT A ONE-OFF. **34 INSTANCES IN ONE RUN, AT FOUR GROUPS AND FOURTEEN EMPLOYERS.**
+
+The paragraphs above were written from a **single** live case (Nationwide `098972`) and describe it
+as a newly-found mechanism. **That framing is wrong and is the thing to correct**: this is ordinary,
+high-frequency behaviour, not an edge case.
+
+| Group | Instances | Employers |
+|---|---|---|
+| G1 | **26** | Allstate · J&J · Capital One · Scopely |
+| G4b | 6 | Kohl's · Dick's · Ulta · Foodsmart · Alt · Digible |
+| G4a | 1 | Marsh `R_363216` |
+| G5 | 1 | Nationwide `098972` (the original case, reproduced) |
+
+- **Of G1's 26: 17 cosmetic, 9 substantive, and ONE crossed a reported-tier boundary** — Allstate
+  `R33667`, stored `Exposure Intelligence Analyst…` (**analyst**) against a served
+  `Databases & Data Stores Service (Lead) Consultant…` (**borderline**). G4b's six include
+  Foodsmart `Director, Data Platform` → `Senior Manager, Data Platform` and Alt `Data Engineer` →
+  `Data Engineer, Ingestion Platform`.
+- 🔴 **Every one was suppressed, and every one correctly.** §3 is absolute: a dedup hit is ALWAYS a
+  suppress, whatever the stored tag, and a stored entry is never re-litigated or promoted. **No
+  handling changes.** Four groups reached that conclusion independently, which is why it is
+  recorded as a mechanism rather than as one group's narrative.
+- 🔴 **What changes is how a run should READ it.** `is_seen()` short-circuits on the byte-identical
+  URL, so `reqid_verdict()` is **structurally never consulted** — the retitle machinery has no
+  opportunity to fire. A title gaining or losing a data word under a stable URL is therefore
+  invisible to the report **by design and routinely**. Do not read a run with many such
+  suppressions as evidence that the retitle protection has failed; the protection is about the
+  req-ID *fold*, which this case never reaches.
+- 🔵 **Cost is zero, and this measurement is what makes "zero" a finding rather than an
+  assumption.** 33 of 34 crossed no tier boundary at all; the one that did moved *between* two
+  tiers the operator sees either way. **But the zero is luck, not structure** — the same mechanism
+  on a title moving `None` → `core` under a stable URL would silently withhold a genuine new core
+  match, and nothing in any count, identity or control would show it. That is the exposure to
+  weigh if this is ever ruled on; at 34 instances per run it is no longer rare enough to leave
+  unmeasured.
 
 #### 🔴 RETITLES ARE NEVER SILENTLY SUPPRESSED — this is the load-bearing half of the ruling
 
@@ -1003,6 +1415,56 @@ Tables are `Company | Title | Location | Link`, link text uniformly the word `po
 Every posting is a clickable link; self-check that unique links == posting rows. Prose goes
 after, under `# Notes`.
 
+🔴 **AND RESOLVE THE COMPANY-LIST LINKS BEFORE PUBLISHING — counting them is not checking them**
+*(added 2026-09-09 r4, after the operator found dead links in a published report)*. On that run
+**eight Workday URLs were built without their site segment**; every one returned HTTP 404, the
+count check passed because there were eight of them, and **five were also false `new` rows —
+already tracked, byte-identical titles, one for six weeks** — because the same malformed string
+is the tracker key. **An unreachable link is an unmatchable key**, which is the "resurfaces as
+new forever" failure this file already forbids in §3, arriving through the report rather than
+through dedup. It is ~20 requests. ⚠️ **Indeed is exempt and must not be link-checked**:
+`viewjob?jk=` returns **401 to any automated client, including for a garbage jobkey**, so the
+status carries no signal there.
+
+#### 🔴🔴 A WORKDAY FRONT-END URL CANNOT BE LINK-CHECKED BY STATUS CODE — THE GARBAGE CONTROL FAILS OPEN *(found 2026-09-12)*
+
+`…/Capital_One/job/McLean-VA/Not-A-Real-Job_R9999999` returns **HTTP 200**. So does every real
+posting. **A 200 on a `{tenant}.myworkdayjobs.com/{site}/job/…` URL therefore proves only that
+the tenant answered**, which makes the check this section mandates a no-op on what is by far the
+most common URL shape in the report.
+
+- **Nor does content save it at the HTML layer.** Real postings return 19–28 KB SPA shells and the
+  garbage control ~6.5 KB, but **neither carries job data** — no `<title>`, no `postedOn`, no
+  `jobPostingInfo`, no `timeType`. Size is the only difference, and this file already records at
+  three employers that size is dead as a signature.
+- ✅ **VERIFY WORKDAY ROWS AT THE CXS DETAIL ENDPOINT INSTEAD:**
+  `https://{host}/wday/cxs/{tenant}/{site}/job/{externalPath}`. It returns the requisition's
+  `title` and `country.descriptor`, and the garbage control returns **no title at all** — so the
+  control discriminates there even though it fails open one layer up. On 2026-09-12 all seven
+  Workday rows verified this way: every title **byte-identical** to the reported title, every
+  `country.descriptor` = `United States of America`.
+- 🔵 **Bonus, and the reason to prefer this endpoint on principle: it re-checks the SERVED TITLE
+  against the published one**, which is the slug-vs-title trap §3 warns about, in the same request.
+  A status-code check can never do that.
+- 🔴 **Do NOT check whether the req id echoes back in the body.** The id is in the requested path,
+  so the page returning it proves nothing — the identical defect already recorded against HCA's
+  path-derived content token.
+
+#### 🔴 THE LINK CHECKER ITSELF CAN PRODUCE A FALSE MISS, AND ON 2026-09-12 IT PRODUCED TWELVE *(homed here because the cure lives in this rule)*
+
+All twelve links returned curl exit status `000`. **They were not dead — the URL list had been
+written by Python on Windows, so every line carried a trailing `\r`** and curl was handed an
+invalid URL. Stripping CR gave **12/12 HTTP 200**.
+
+- 🔵 **What made it visible was a control with different line endings**: the garbage controls in the
+  same run came from a heredoc, had LF endings, and returned real status codes — so a run where
+  *everything* failed and *the controls passed* was self-evidently instrumentation, not twelve dead
+  postings. **Without that contrast, `000` on all twelve reads exactly like a board-wide outage.**
+- 🔴 **Rule: feed the checker LF-terminated input, and treat an all-rows-identical failure as an
+  instrumentation fault until a control proves otherwise.** This is the standing "a verification
+  script that can produce a false miss will eventually produce a false pass" lesson, arriving
+  inside the checker this section mandates.
+
 🔴 **EVERY TABLE IS EMITTED EVEN WHEN EMPTY**, carrying the standing `*(none)*`
 placeholder row. **That is the entire point of the change** — see below.
 
@@ -1148,6 +1610,28 @@ unverified census is precisely the "a healthy health check is NOT a proof" failu
 project keeps re-learning — Travelers' `seo_url` reading a healthy 361 while reporting 31
 of 31 as false new; `is_us()` passing 104 tests with zero `country_code` fixtures. The
 schema is in `implementation.md`, "Dispatch-group deliverable contract".
+
+#### 🔴 THE EMPTY-INDEX CONTROL MUST BE EVALUATED **BEFORE** THE REAL DEDUP BRANCH *(pinned 2026-09-09 r2)*
+
+Replaying the post-bar candidates against an **empty** index — and checking that fully formed
+rows emit, with real titles and canonical URLs — is standing practice across all six groups. It
+is what proves the **emit path** is alive rather than merely quiet, and it is what caught the two
+`seo_url`-class false-friend URLs on 2026-09-08 r2 that no count could see.
+
+🔴 **But the control is easy to write in a form that proves NOTHING, and the wrong form looks
+correct.** G4b's first implementation on 2026-09-09 r2 incremented the counter *inside* the
+surviving path, **after** the suppression branches — so it returned exactly the surviving row
+count by construction. It cannot fail, it cannot disagree with the report, and **every count in
+the contract still balances.**
+
+**Rule: build the control set from the post-bar candidates before any dedup branch runs, then
+replay it against a zero-key index.** A control whose value is derived downstream of the thing it
+is controlling for is not a control. 🔵 **This is the same shape as the census itself** — a number
+computed from the same path it is meant to check is a restatement, not a verification.
+
+⚠️ **The healthy signature is a control count MUCH LARGER than the reported count** (2026-09-09
+r2: G1 440 against 4 reported, G4a 97 against 0, G3 99 against 2). A control returning exactly
+the reported count is the defect above, not a quiet board.
 
 #### 🔴 THE FILTER **ORDER** IS PART OF THE CONTRACT — pinned 2026-09-02 r3
 

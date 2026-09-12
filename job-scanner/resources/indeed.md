@@ -104,6 +104,10 @@ This is a second, independent source alongside the company career-site scan (`co
   - 🔴 **2026-08-27: the variants again did NOT return an identical `totalJobCount`** (q1 base 32, ENTRY 32, MID **25**, SENIOR 32). This re-confirms the 2026-08-26 r2 correction — **the identical-count evidence for "the facet ranks rather than filters" is dead; stop citing it.** The conclusion still holds on the recovery evidence itself.
   - ⚠️ **This does not close the coverage gap, it narrows it.** Title-splitting reached its limit at ~15 postings/run under-covered; facet unioning recovers ~3 of those. **Page 2+ remains unreachable** (sign-in wall), so a residual gap stands.
 - **🔴 A TRANSIENT HTTP 403 ON A SINGLE QUERY OR FACET VARIANT CLEARS ON ONE RETRY — retry before declaring this source blocked.** Observed 2026-08-27 r2 on q2's `ENTRY_LEVEL` variant (403, 11,561 B); a single retry returned 200 / 230,643 B. A one-query 403 is not the same event as the documented site-wide block, and treating it as one throws away a whole query's coverage.
+  - **🔴🔴 IT FIRED ON ALL EIGHT QUERIES AT ONCE ON 2026-09-11 r2 — A WHOLE-SET 403 THAT WAS STILL NOT A BLOCK.** Every query returned **HTTP 403 / ~28 KB / `<title>Security Check - Indeed.com</title>`** on the first pass. **One retry cleared 7 of 8; q3 cleared on the next.** Final state: 8/8 HTTP 200.
+    - 🔴 **This is the case the rule above did not cover, and it is the expensive one.** "A single query" is exactly the scope a reader checks against, so a run seeing all eight fail has apparent grounds to call the source blocked — **and would have thrown away the entire source for the day**, which is the whole-of-Indeed version of the one-query cost this bullet already warns about.
+    - ✅ **Rule: retry the whole set at least once before declaring Indeed blocked, however many queries failed.** A block is diagnosed on **controls**, not on a count of failing queries. This run's controls all discriminated: homepage **200**, garbage path **404 `Not Found | Indeed`**, `viewjob` on a garbage jobkey **401** (the documented link-check exemption).
+    - ⚠️ **The `Security Check` title is a real signature and should be recorded when seen** — but it is a *rate-limit/challenge* shape that clears, not the site-wide block described in the etiquette note below. Do not conflate them.
 - **🟢 2026-08-31 — NO QUERY SATURATED, so the lever did not fire at all.** Extractions were
   13 / 7 / 8 / 5 / 5 / 11 / 6 / 8 against the `>= 15` trigger; max 13. **This is the first
   run on record where the facet-variant stage cost zero requests**, and it is a genuine
@@ -111,6 +115,151 @@ This is a second, independent source alongside the company career-site scan (`co
   which would misrepresent the lever as having been tried and failed. Under the 8-query
   split the two historically-saturating queries (`data engineer`, `data analyst`) came in
   at 13 and 11, so the split may finally be holding the ceiling on its own. One run.
+- **🟢 2026-09-08 r3 — NO QUERY SATURATED AGAIN, so the lever did not fire at all.** Extractions
+  were **14 / 5 / 7 / 6 / 6 / 7 / 6 / 9** against the `>= 15` trigger; max 14, and q1 (`data
+  engineer`) came closest without reaching it. **Zero requests spent.** 🔴 **Do NOT append this to
+  the yield history below as another `0`** — a lever that never fired has not been tried and
+  failed, and recording it as a zero would misrepresent it. Same non-event as 2026-08-31 and
+  2026-09-08 r1/r2; contrast 2026-09-07, where it did fire and recovered 0.
+  - 🔵 **Five consecutive non-saturating runs now.** The 8-query split may genuinely be holding the
+    page-1 ceiling on its own — the two historically-saturating queries came in at 14 and 7.
+    **Do not conclude that yet**: sponsored injections consume page-1 capacity, so a query can be
+    saturated on real results while extracting fewer than 15 of them.
+- **🔴 `totalJobCount` WRONG IN BOTH DIRECTIONS ON 7 OF 8 QUERIES (2026-09-08 r3).** q1 17 vs 14
+  extracted, **q2 0 vs 5**, q3 7 vs 7, **q4 1 vs 6**, **q5 1 vs 6**, q6 8 vs 7, **q7 1 vs 6**,
+  q8 11 vs 9. **Only q3 agreed.** A query again reported a meta count of **zero while returning
+  five extractable records**. The field remains unusable in either direction; `extracted >= 15` is
+  still the only saturation signal worth acting on.
+- **⚠️ THE SPONSORED-INJECTION FAMILY IS STILL LIVE, AND IT STILL REACHES A TIER.** The FBI
+  `Special Agent: Data Science & Intelligence Expertise` posting returned on q7 dated **"7 days
+  ago" under `fromage=7`**, reached **borderline** on the net, and was judged away — strip the
+  domain words and it is a federal law-enforcement role. **Expect this family every run; it is not
+  a parser fault and not a bar fault.**
+- **🔴 2026-09-09 r2 — THE SATURATION STREAK BROKE: q1 EXTRACTED EXACTLY 15 AND THE LEVER FIRED, RECOVERING 0.** After **six** consecutive non-saturating runs, `title:(data engineer)` hit the ceiling again. All three `explvl` variants returned HTTP 200 and extracted **15 each — and every one was already in the base set.**
+  - 🔴 **THIS IS A REAL ZERO FOR THE YIELD HISTORY, unlike the six runs before it.** The distinction is the whole point of the standing note: a lever that **never fired** has not been tried, while a lever that fired and recovered nothing has. History becomes **`3 · 3 · 3 · 2 · 0 · 0 · 0 · 0`**.
+  - 🔵 **Worth noting against the "the 8-query split may be holding the ceiling on its own" hypothesis: it is not.** Five consecutive non-saturating runs looked like the split had solved it; run six saturated. **The split reduces the frequency, it does not remove the ceiling** — and sponsored injections still consume page-1 capacity, so a query can be saturated on real results while extracting fewer than 15.
+  - ⚠️ **All three variants extracting exactly 15 is itself a data point**: the variants are subject to the same page-1 ceiling as the base query, so on a saturated query they can only ever re-rank within a full page. That is consistent with "the facet ranks, it does not filter", and it bounds what this lever can ever recover.
+- **🟢 2026-09-09 r3 — NO QUERY SATURATED; THE STREAK-BREAK DID NOT PERSIST.** Extractions were
+  **14 / 5 / 9 / 6 / 6 / 6 / 6 / 6** against the `>= 15` trigger; max 14, and q1 (`data engineer`)
+  again came closest without reaching it — the same 14 it hit on 2026-09-08 r3. **Zero requests
+  spent.** 🔴 **Do NOT append this to the yield history as another `0`** — a lever that never
+  fired has not been tried and failed. History stays `3 · 3 · 3 · 2 · 0 · 0 · 0 · 0`.
+  - 🔵 **Read together with r2, this is the clearest statement of the ceiling's behaviour yet:**
+    six non-saturating runs, then r2 saturated at exactly 15, then r3 came in at 14. **q1 sits
+    right at the boundary and crosses it intermittently.** Neither "the split has solved it" nor
+    "the split has stopped working" is supportable — the split reduces the *frequency* of
+    saturation on a query that is permanently marginal. Expect the lever to fire occasionally
+    and indefinitely.
+- **🟢 2026-09-12 r1 — NO QUERY SATURATED.** Extractions **13 / 5 / 8 / 5 / 6 / 10 / 6 / 8** against
+  the `>= 15` trigger; max 13, **q1 (`data engineer`) is the largest query again** after two runs in
+  which q6 was. **Zero requests spent.** 🔴 **Do NOT append this to the yield history as another
+  `0`** — a lever that never fired has not been tried and failed. History stays
+  `3 · 3 · 3 · 2 · 0 · 0 · 0 · 0`.
+  - 🔵 **q1's drift is now eight runs long: 15 → 14 → 12 → 13 → 10 → 8 → 13.** It **reversed
+    sharply** this run, from its recorded low of 8 back to 13. 🔴 **This kills any reading of the
+    previous three runs as a downward trend** — the "permanently marginal, oscillating rather than
+    trending" characterisation is the one that keeps fitting, and the 8 was a trough rather than a
+    new level. Do not read either direction as the source easing or tightening; sponsored injections
+    consume page-1 capacity, so a query can be saturated on real results while extracting well
+    under 15.
+  - 54 unique jobkeys, **zero shape-rejects and zero duplicate jobkeys** across all eight blobs —
+    the duplicate-serving quirk has now been absent **five** runs running.
+  - **36 post-bar candidates → 23 suppressed → 1 judged away → 12 new** (5 core, 2 analyst,
+    3 lead_manager, 2 borderline) — **the largest Indeed yield on record for this query set.** Empty-index
+    control **36 against 12**, the healthy control-≫-reported shape. Zero AMBIGUOUS, zero non-US,
+    zero qualifying exclusions (the exclusion was proven live at the company list instead, 27 audit
+    rows).
+  - ⚠️ **The judged-away row is a pre-sales/GTM title, which is the recurring Indeed shape:** AWS
+    `Principal Worldwide Specialist Solutions Architect, Agentic AI, Data & AI GTM` — "GTM" is
+    go-to-market, the same family as the recorded `Sr. Solution Sales Executive, Clinical Analytics`
+    judgement. Note `principal` did **not** route it: borderline is not routed.
+  - ⚠️ **One posting was served twice under two different employers** — `Senior Manager Data Engineer
+    (Databricks, Pyspark, Snowflake)` under both **Capital One** and the **Information Technology
+    Senior Management Forum**, with distinct jobkeys. Per the known-duplicate rule both are tracked
+    separately rather than de-duped on title+company+location. 🔵 **This is the first recorded instance
+    where the two copies carry DIFFERENT company names** — the documented quirk describes a same-company
+    repost, so a de-dupe keyed on title+location alone would have collapsed them.
+  - 🔵 **A company-list employer and Indeed surfaced the same opening**, which is expected and is not a
+    duplicate to collapse: United Health's `Senior Data Engineer (DBA)` (Schaumburg IL) is the
+    company-list row and Indeed carries it under **Optum**, UHG's subsidiary. The two sources keep
+    separate trackers by design, so each is keyed and reported independently.
+- **🔴 `totalJobCount` WRONG ON 8 OF 8 FOR A SEVENTH CONSECUTIVE RUN** *(2026-09-12 r1)*. Seventeenth
+  consecutive run of the field being wrong in both directions; **q2 and q4 each reported a meta count
+  of ZERO while returning five extractable records.** Per the standing note, only the fact of
+  disagreement is recorded, not the per-query figures.
+- **🟢 2026-09-11 r2 — NO QUERY SATURATED.** Extractions **8 / 5 / 7 / 5 / 7 / 10 / 6 / 8** against
+  the `>= 15` trigger; **max 10, again q6 (`data analyst`), not q1** — q1 (`data engineer`) came in at
+  **8**, a new low. **Zero requests spent.** 🔴 **Do NOT append this to the yield history as another
+  `0`.** History stays `3 · 3 · 3 · 2 · 0 · 0 · 0 · 0`.
+  - 🔵 **q1's drift is now seven runs long: 15 → 14 → 12 → 13 → 10 → 8**, and q6 has been the largest
+    query for two consecutive runs. **Read it with the standing warning, not as the source easing** —
+    sponsored injections consume page-1 capacity, so a query can be saturated on real results while
+    extracting well under 15. "Permanently marginal" still fits; a *falling* q1 is as consistent with
+    fewer genuine Chicago-area postings as with a looser ceiling, and this source cannot tell them apart.
+  - 46 unique jobkeys, **zero shape-rejects and zero duplicate jobkeys** across all eight blobs —
+    the duplicate-serving quirk has now been absent **four** runs running.
+  - **31 post-bar candidates → 29 suppressed → 1 judged away → 1 new** (core: Google
+    `Customer Engineer II, Business Intelligence, NorthAm, Google Cloud`). Empty-index control **31
+    against 1** — the healthy control-≫-reported shape. Zero AMBIGUOUS, zero non-US, zero qualifying
+    exclusions (the exclusion was proven live at the company list instead, 27 audit rows).
+- **🔴 `totalJobCount` WRONG ON 8 OF 8 FOR A SIXTH CONSECUTIVE RUN** *(2026-09-11 r2)*. Sixteenth
+  consecutive run of the field being wrong in both directions; **q2 and q4 each reported a meta count
+  of ZERO while returning five extractable records.** Per the standing note, only the fact of
+  disagreement is recorded, not the per-query figures.
+- **🟢 2026-09-11 r1 — NO QUERY SATURATED.** Extractions **10 / 5 / 7 / 5 / 6 / 11 / 6 / 8** against
+  the `>= 15` trigger; **max 11, and it was q6 (`data analyst`), not q1** — q1 (`data engineer`) came
+  in at **10**. **Zero requests spent.** 🔴 **Do NOT append this to the yield history as another
+  `0`.** History stays `3 · 3 · 3 · 2 · 0 · 0 · 0 · 0`.
+  - 🔵 **q1's drift around the ceiling is now six runs long: 15 → 14 → 12 → 13 → 10.** This is its
+    lowest reading on record and the **first run in which q1 was not the largest query** — but read
+    it with the standing warning rather than as the source easing: r2's "12, further below the
+    boundary" was partly walked back one run later, and **sponsored injections consume page-1
+    capacity**, so a query can be saturated on real results while extracting fewer than 15. The
+    "permanently marginal" reading still fits better than either extreme.
+  - 49 unique jobkeys, **zero shape-rejects and zero duplicate jobkeys** across all eight blobs —
+    the duplicate-serving quirk has now been absent **three** runs running.
+  - **35 post-bar candidates → 26 suppressed → 2 judged away → 7 new** (1 core, 4 analyst,
+    1 lead_manager, 1 borderline). Empty-index control **35 against 7** — the healthy
+    control-≫-reported shape. Zero AMBIGUOUS and zero non-US, with the exclusion proven live at the
+    company list rather than here.
+- **🔴 `totalJobCount` WRONG ON 8 OF 8 FOR A FIFTH CONSECUTIVE RUN** *(2026-09-11 r1)*. Fifteenth
+  consecutive run of the field being wrong in both directions; **q2 and q4 each reported a meta count
+  of ZERO while returning five extractable records.** Per the standing note, only the fact of
+  disagreement is recorded, not the per-query figures.
+- **🟢 2026-09-10 r3 — NO QUERY SATURATED.** Extractions **13 / 5 / 8 / 5 / 6 / 10 / 6 / 7** against
+  the `>= 15` trigger; max 13, q1 (`data engineer`) at **13**. **Zero requests spent.** 🔴 **Do NOT
+  append this to the yield history as another `0`.** History stays `3 · 3 · 3 · 2 · 0 · 0 · 0 · 0`.
+  - 🔵 **q1's drift around the ceiling is now five runs long: 15 → 14 → 12 → 13.** It oscillates
+    rather than trends, which is the "permanently marginal" reading holding — **and note r2's "12,
+    further below the boundary" is already partly walked back one run later.** Do not read a single
+    step away from the ceiling as the source easing. Queries 2–8 were **byte-identical to r2's
+    extraction counts** (5/8/5/6/10/6/7), so the whole movement is in q1.
+  - 47 unique jobkeys, **zero shape-rejects and zero duplicate jobkeys** across all eight blobs —
+    the duplicate-serving quirk has now been absent two runs running.
+  - **34 post-bar candidates → 33 suppressed → 1 new** (Molex `Data Analyst`, Lisle IL). Empty-index
+    control **34 against 1 reported** — the healthy control-≫-reported shape.
+- **🔴 `totalJobCount` WRONG ON 8 OF 8 FOR A FOURTH CONSECUTIVE RUN** *(2026-09-10 r3)*. Fourteenth
+  consecutive run of the field being wrong in both directions; **q2 and q5 each reported a meta count
+  of ZERO or ONE while returning five and six extractable records**, and q1 over-reported (15 vs 13).
+  Per the standing note, only the fact of disagreement is recorded, not the per-query figures.
+- **🟢 2026-09-10 r2 — NO QUERY SATURATED.** Extractions **12 / 5 / 8 / 5 / 6 / 10 / 6 / 7** against
+  the `>= 15` trigger; max 12, and q1 (`data engineer`) came in at 12 — **further below the boundary
+  than the 14s of 2026-09-08 r3 and 2026-09-09 r3.** **Zero requests spent.** 🔴 **Do NOT append this
+  to the yield history as another `0`** — a lever that never fired has not been tried and failed.
+  History stays `3 · 3 · 3 · 2 · 0 · 0 · 0 · 0`.
+  - 🔵 **Consistent with the "permanently marginal" reading, not with either extreme:** q1 has now
+    gone 15 (saturated) → 14 → 12 across three runs. It drifts around the ceiling rather than
+    trending. Zero shape-rejects and **zero duplicate jobkeys** across all eight blobs this run —
+    the duplicate-serving quirk did not appear.
+- **🔴 `totalJobCount` WRONG ON 8 OF 8 FOR A THIRD CONSECUTIVE RUN** *(2026-09-10 r2)*. Thirteenth
+  consecutive run of the field being wrong in both directions; **q2 and q4 each reported a meta count
+  of ZERO while returning five extractable records.** Per the standing note, only the fact of
+  disagreement is recorded, not the per-query figures.
+- **🔴 `totalJobCount` WRONG ON 8 OF 8 FOR A SECOND CONSECUTIVE RUN** *(2026-09-09 r3)*.
+  Twelfth consecutive run of the field being wrong in both directions. Per the standing note
+  above, **only the fact of disagreement is now recorded — not the per-query figures.** The
+  zero-while-returning-records shape recurred again.
+- **🔴 `totalJobCount` WRONG ON 8 OF 8 — THE FIRST RUN ON RECORD WHERE NONE AGREED** *(2026-09-09 r2)*. q1 17 vs **15** extracted, **q2 0 vs 5**, q3 5 vs **10**, **q4 1 vs 6**, **q5 1 vs 6**, q6 5 vs **10**, **q7 1 vs 6**, q8 7 vs **6**. Under-reported on six, over-reported on two, and **a query again reported zero while returning five extractable records.** Eleventh consecutive run. **The field is unusable in either direction and should not be recorded per-query any more — record only that it disagreed.**
 - **🔴 FACET-UNION YIELD HISTORY: 3 · 3 · 3 · 2 · 0 · 0 · 0** *(through 2026-08-28 r2)*. **The "consistent ~3 records per run" characterisation is DEAD — THREE consecutive runs have now recovered nothing.** The lever costs 6 requests and the operator's 2026-08-26 ruling says keep all three variants, so **no change is proposed** and the per-variant split should still be recorded each run as a data point. But do not present ~3/run as the expected yield.
 - ⚠️ **Whether the variants return the same `totalJobCount` as base is a PER-RUN VARIABLE, not evidence.** They agreed on 2026-08-26 (26) and 2026-08-28 (32) and diverged on 2026-08-27 (base 32, MID 25). **The ranks-not-filters conclusion rests on the recovery evidence, not on count agreement** — cite the recoveries, not the counts.
 - **Known duplicate quirk:** the same-looking posting can appear under two distinct `jobkey` values (confirmed 2026-08-06 on an earlier, wider test query: System One's "Data Architect- Wealth Management," Naperville — two different keys, same title/company/location). Likely a genuine staffing-agency repost, not a parsing bug — track both as separate entries rather than trying to de-dupe by title+company+location.
